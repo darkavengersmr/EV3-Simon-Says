@@ -1,0 +1,140 @@
+u = 1
+M = "A"
+P = 0
+k = 1
+For s = 1 To 20
+  a = Math.GetRandomNumber(3)
+  b[s] = Math.Round(a) 
+EndFor   
+
+Sub MyMotor
+  t = EV3.Time
+  regulator = "True"
+  While regulator
+    e = P - Motor.GetCount(M)
+    v = e * k
+    If M = "C" Then
+      v = v * 0.75
+    EndIf
+    Motor.Start(M,v)
+    If Math.Abs(Motor.GetCount(M) - P) < 5 Then
+      regulator = "False"
+    EndIf
+    If  EV3.Time - t > 1000 Then
+      regulator = "False"
+    EndIf  
+  EndWhile
+  Motor.Stop(M,"True")
+  Program.Delay(200)
+  Motor.Stop(M,"False")
+EndSub
+
+While "True" 
+  
+  nextu:  
+  
+  For z = 1 To u
+    If  b[z] = 1 Then
+      M = "A"
+      P = 50
+      Speaker.Note(100, "C5", 150)
+      MyMotor()
+      M = "A"
+      P = 0
+      MyMotor()
+    EndIf  
+    If  b[z] = 2 Then
+      M = "B"
+      P = 50
+      Speaker.Note(100, "D5", 150)
+      MyMotor()
+      M = "B"
+      P = 0
+      MyMotor()
+    EndIf
+    If  b[z] = 3 Then
+      M = "C"
+      P = -40
+      Speaker.Note(100, "E5", 150)
+      MyMotor()
+      M = "C"
+      P = 0
+      MyMotor()
+    EndIf    
+  EndFor
+  
+  For w = 1 To u
+    While Motor.GetCount("A") < 40 And Motor.GetCount("B") < 40 And Motor.GetCount("C") > -40
+    EndWhile
+    
+    Program.Delay(200)
+    
+    If Motor.GetCount("A") > 40 Then
+      If b[w] = 1 Then
+        Speaker.Note(100, "C5", 150)
+        Speaker.Wait()
+      EndIf
+      M = "A"
+      P = 0
+      MyMotor()      
+      If b[w] <> 1 Then
+        Speaker.Note(100, "C4", 300)
+        M = "A"
+        P = -50
+        MyMotor()
+        Speaker.Note(100, "C4", 300)
+        M = "A"
+        P = 0
+        MyMotor()        
+        Goto nextu
+      EndIf        
+    EndIf
+    
+    If Motor.GetCount("B") > 40 Then
+      If b[w] = 2 Then
+        Speaker.Note(100, "D5", 150)
+        Speaker.Wait()
+      EndIf
+      M = "B"
+      P = 0
+      MyMotor()
+      If b[w] <> 2 Then
+        Speaker.Note(100, "C4", 300)
+        M = "B"
+        P = -50
+        MyMotor()
+        Speaker.Note(100, "C4", 300)
+        M = "B"
+        P = 0
+        MyMotor()
+        Goto nextu      
+      EndIf
+    EndIf 
+    
+    If Motor.GetCount("C") < -40 Then
+      If b[w] = 3 Then
+        Speaker.Note(100, "E5", 150)
+        Speaker.Wait()
+      EndIf
+      M = "C"
+      P = 0
+      MyMotor()
+      If b[w] <> 3 Then
+        Speaker.Note(100, "C4", 300)
+        M = "C"
+        P = 50
+        MyMotor()
+        Speaker.Note(100, "C4", 300)
+        M = "C"
+        P = 0
+        MyMotor()
+        Goto nextu         
+      EndIf        
+    EndIf 
+    
+  EndFor
+  
+  u = u + 1    
+  
+EndWhile
+
